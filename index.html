@@ -19,6 +19,7 @@
         animation: gradientBG 10s ease infinite;
         text-align: center;
         overflow: hidden;
+        transition: all 0.5s ease;
     }
 
     @keyframes gradientBG {
@@ -63,12 +64,12 @@
         font-size: 3.5rem;
         color: white;
         text-shadow: 3px 3px 10px black;
-        animation: pop 1s ease forwards;
+        animation: pop 0.8s ease forwards;
     }
 
     @keyframes pop {
-        0% {transform: scale(0);}
-        100% {transform: scale(1);}
+        0% {transform: scale(0) rotate(-10deg);}
+        100% {transform: scale(1) rotate(0deg);}
     }
 
 </style>
@@ -90,6 +91,16 @@ let clickCount = 0;
 let pocoSize = 1;
 let tantoSize = 1;
 
+function showThankYou() {
+    document.body.innerHTML = `
+        <div class="thankyou">
+            awwww lo sapevo!! anche io xdxd 💖🎬✨
+        </div>
+    `;
+    document.body.style.background = "linear-gradient(45deg, #ff00cc, #3333ff)";
+}
+
+// CLICK SU POCO
 pocoBtn.addEventListener("click", function() {
     clickCount++;
 
@@ -101,15 +112,16 @@ pocoBtn.addEventListener("click", function() {
     pocoBtn.style.transform = "scale(" + pocoSize + ")";
     tantoBtn.style.transform = "scale(" + tantoSize + ")";
 
-    if (clickCount >= 8) {
-        document.body.innerHTML = `
-            <div class="thankyou">
-                awwww lo sapevo!! anche io xdxd 💖🎬✨
-            </div>
-        `;
-        document.body.style.background = "linear-gradient(45deg, #ff00cc, #3333ff)";
+    if (clickCount >= 7) {
+        showThankYou();
     }
 });
+
+// CLICK SU TANTO
+tantoBtn.addEventListener("click", function() {
+    showThankYou();
+});
+
 </script>
 
 </body>
