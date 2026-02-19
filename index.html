@@ -73,6 +73,7 @@
             align-items: center;
             justify-content: center;
             flex-wrap: wrap;
+            transition: all 0.6s ease;
         }
 
         .btn {
@@ -114,6 +115,27 @@
             box-shadow: 
                 0 20px 45px -10px rgba(0, 0, 0, 0.5),
                 0 0 55px rgba(248, 113, 182, 0.9);
+        }
+
+        /* Quando "tanto" domina */
+        .tanto-dominant .btn.poco {
+            transform: scale(0.4) !important;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .tanto-dominant .btn.tanto {
+            transform: scale(1.9) !important;
+            padding: 1.8rem 4.8rem;
+            font-size: clamp(2.2rem, 6vw, 3.2rem);
+            box-shadow: 
+                0 30px 70px -15px rgba(0,0,0,0.6),
+                0 0 80px rgba(248,113,182,1);
+            z-index: 10;
+        }
+
+        .tanto-dominant .buttons {
+            gap: 1rem;
         }
 
         /* Final screen */
@@ -170,13 +192,17 @@
             }
         }
 
-        /* Responsive adjustments */
+        /* Responsive */
         @media (max-width: 480px) {
             .buttons {
                 gap: 2rem;
             }
             .btn {
                 padding: 1.1rem 2.4rem;
+            }
+            .tanto-dominant .btn.tanto {
+                transform: scale(1.6) !important;
+                padding: 1.4rem 3.8rem;
             }
         }
     </style>
@@ -186,7 +212,7 @@
     <div id="start-screen" class="screen">
         <h1 class="question">quanto sei contento<br>di andare al cinema stasera?</h1>
         
-        <div class="buttons">
+        <div class="buttons" id="buttons-container">
             <button id="poco-btn" class="btn poco">poco</button>
             <button id="tanto-btn" class="btn tanto">tanto</button>
         </div>
@@ -200,22 +226,23 @@
 
     <script>
         // ====================== VARIABILI ======================
-        let pocoScale = 1;
+        let pocoScale  = 1;
         let tantoScale = 1;
-        const SCALE_POCO_STEP = 0.86;
-        const SCALE_TANTO_STEP = 1.19;
-        const TANTO_HUGE_THRESHOLD = 3.6;   // dopo circa 7-8 click su "poco"
+        let pocoClicks = 0;
+        const MAX_POCO_CLICKS = 6;          // dopo 6 click su "poco" → tanto domina
+        const SCALE_POCO_STEP  = 0.82;
+        const SCALE_TANTO_STEP = 1.22;
 
         // ====================== ELEMENTI DOM ======================
-        const startScreen = document.getElementById('start-screen');
-        const finalScreen = document.getElementById('final-screen');
-        const pocoBtn = document.getElementById('poco-btn');
-        const tantoBtn = document.getElementById('tanto-btn');
+        const startScreen       = document.getElementById('start-screen');
+        const finalScreen       = document.getElementById('final-screen');
+        const pocoBtn           = document.getElementById('poco-btn');
+        const tantoBtn          = document.getElementById('tanto-btn');
+        const buttonsContainer  = document.getElementById('buttons-container');
         const sparklesContainer = document.getElementById('sparkles');
 
         // ====================== FUNZIONI ======================
-        
-        // Crea sparkle eleganti
+
         function createSparkles() {
             const emojis = ['✨', '🌟', '💫', '⭐', '✨'];
             const positions = [
@@ -244,11 +271,8 @@
             });
         }
 
-        // Mostra la schermata finale con transizione fluida
         function showFinalScreen() {
-            // Cambia sfondo corpo per renderlo più dolce
             document.body.style.background = 'linear-gradient(135deg, #6b21a8, #db2777, #1e40af)';
-
             startScreen.style.opacity = '0';
             
             setTimeout(() => {
@@ -258,29 +282,48 @@
             }, 850);
         }
 
+        function makeTantoDominant() {
+            buttonsContainer.classList.add('tanto-dominant');
+            pocoBtn.style.pointerEvents = 'none';
+            tantoBtn.style.cursor = 'pointer';
+            tantoBtn.focus();
+        }
+
         // ====================== EVENT LISTENERS ======================
-        
-        // Click su "poco"
+
         pocoBtn.addEventListener('click', () => {
-            // Riduci "poco"
-            pocoScale = Math.max(pocoScale * SCALE_POCO_STEP, 0.22);
+            pocoClicks++;
+            
+            // Riduci poco
+            pocoScale = Math.max(pocoScale * SCALE_POCO_STEP, 0.25);
             pocoBtn.style.transform = `scale(${pocoScale})`;
             
-            // Ingrandisci "tanto"
+            // Ingrandisci tanto
             tantoScale *= SCALE_TANTO_STEP;
             tantoBtn.style.transform = `scale(${tantoScale})`;
+
+            // Dopo tot click → tanto prende il controllo
+            if (pocoClicks >= MAX_POCO_CLICKS) {
+                makeTantoDominant();
+            }
         });
 
-        // Click su "tanto"
         tantoBtn.addEventListener('click', () => {
-            if (tantoScale > TANTO_HUGE_THRESHOLD) {
+            // Basta un click su tanto dopo che ha preso il dominio
+            if (pocoClicks >= MAX_POCO_CLICKS) {
                 showFinalScreen();
             }
-            // Se non è ancora enorme, non succede niente (come richiesto)
+            // Se cliccato prima → niente di speciale (puoi anche toglierlo se vuoi)
         });
 
-        // Hover extra glow su bottoni (senza interferire con scale)
-        function addHoverGlow() {
+        // ====================== INIT ======================
+        function init() {
+            pocoBtn.style.transition = 'all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            tantoBtn.style.transition = 'all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            
+            createSparkles();
+
+            // Glow hover extra
             const allBtns = document.querySelectorAll('.btn');
             allBtns.forEach(btn => {
                 btn.addEventListener('mouseenter', () => {
@@ -288,35 +331,12 @@
                         ? '0 25px 55px -10px rgba(0,0,0,0.5), 0 0 65px rgba(248,113,182,0.95)'
                         : '0 20px 45px -10px rgba(0,0,0,0.4), 0 0 35px rgba(165,243,252,0.8)';
                 });
-                
                 btn.addEventListener('mouseleave', () => {
                     btn.style.boxShadow = '';
                 });
             });
         }
 
-        // ====================== INIT ======================
-        function init() {
-            // Imposta transizioni iniziali sui bottoni
-            pocoBtn.style.transition = 'transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
-            tantoBtn.style.transition = 'transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
-            
-            // Crea gli sparkle solo per la schermata finale
-            createSparkles();
-            
-            // Aggiungi glow hover
-            addHoverGlow();
-            
-            // Accessibilità extra (tasto Enter su tanto quando enorme)
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && tantoScale > TANTO_HUGE_THRESHOLD && 
-                    document.getElementById('final-screen').style.opacity !== '1') {
-                    showFinalScreen();
-                }
-            });
-        }
-
-        // Avvia tutto
         window.addEventListener('load', init);
     </script>
 </body>
