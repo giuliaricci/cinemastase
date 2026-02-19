@@ -1,171 +1,116 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quanto sei contento di andare al cinema?</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quanto sei contento?</title>
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
-    }
-
+<style>
     body {
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #d9a7ff, #a7c7ff, #ffb7f5);
-      background-size: 400% 400%;
-      animation: gradientShift 12s ease infinite;
-      overflow: hidden;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        background: linear-gradient(45deg, #ff4e50, #fc913a, #f9d423, #24fe41, #00c3ff, #a044ff);
+        background-size: 400% 400%;
+        animation: gradientBG 10s ease infinite;
+        text-align: center;
+        overflow: hidden;
     }
 
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .container {
-      text-align: center;
-      padding: 40px;
-      backdrop-filter: blur(15px);
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 30px;
-      box-shadow: 0 0 40px rgba(255,255,255,0.4);
-      transition: all 0.6s ease;
+    @keyframes gradientBG {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
     }
 
     h1 {
-      font-size: 2rem;
-      color: white;
-      margin-bottom: 40px;
-      text-shadow: 0 0 15px rgba(255,255,255,0.8);
+        font-size: 3rem;
+        color: white;
+        text-shadow: 3px 3px 8px black;
+        margin-bottom: 40px;
     }
 
     .buttons {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      align-items: center;
+        display: flex;
+        gap: 40px;
     }
 
     button {
-      padding: 15px 40px;
-      border-radius: 40px;
-      border: none;
-      font-size: 1.2rem;
-      cursor: pointer;
-      transition: all 0.4s ease;
-      backdrop-filter: blur(10px);
+        padding: 20px 40px;
+        font-size: 1.5rem;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: bold;
     }
 
     #poco {
-      background: rgba(255,255,255,0.3);
-      color: white;
-      box-shadow: 0 0 15px rgba(255,255,255,0.6);
+        background-color: #ff3c78;
+        color: white;
     }
 
     #tanto {
-      background: white;
-      color: #7b5cff;
-      font-weight: bold;
-      box-shadow: 0 0 20px rgba(255,255,255,0.9);
+        background-color: #00e676;
+        color: white;
     }
 
-    button:hover {
-      transform: scale(1.1);
-    }
-
-    .final-screen {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      background: linear-gradient(135deg, #ffb7f5, #a7c7ff);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.8s ease;
-    }
-
-    .final-screen.show {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .final-text {
-      font-size: 3rem;
-      color: white;
-      text-shadow: 0 0 25px rgba(255,255,255,0.9);
-      animation: pop 0.8s ease forwards;
+    .thankyou {
+        font-size: 3.5rem;
+        color: white;
+        text-shadow: 3px 3px 10px black;
+        animation: pop 1s ease forwards;
     }
 
     @keyframes pop {
-      0% { transform: scale(0.8); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
+        0% {transform: scale(0);}
+        100% {transform: scale(1);}
     }
 
-    @media (max-width: 600px) {
-      h1 { font-size: 1.5rem; }
-      button { padding: 12px 25px; font-size: 1rem; }
-      .final-text { font-size: 2rem; }
-    }
-
-  </style>
+</style>
 </head>
-
 <body>
 
-  <div class="container" id="main">
-    <h1>quanto sei contento di andare al cinema stasera?</h1>
-    <div class="buttons">
-      <button id="poco">poco</button>
-      <button id="tanto">tanto</button>
-    </div>
-  </div>
+<h1 id="question">quanto sei contento per il cinema stasera?</h1>
 
-  <div class="final-screen" id="final">
-    <div class="final-text">awww lo sapevo</div>
-  </div>
+<div class="buttons">
+    <button id="poco">poco</button>
+    <button id="tanto">tanto</button>
+</div>
 
-  <script>
-    const pocoBtn = document.getElementById("poco");
-    const tantoBtn = document.getElementById("tanto");
-    const finalScreen = document.getElementById("final");
+<script>
+let pocoBtn = document.getElementById("poco");
+let tantoBtn = document.getElementById("tanto");
+let clickCount = 0;
 
-    let pocoScale = 1;
-    let tantoScale = 1;
+let pocoSize = 1;
+let tantoSize = 1;
 
-    pocoBtn.addEventListener("click", () => {
-      pocoScale *= 0.8;
-      tantoScale *= 1.3;
+pocoBtn.addEventListener("click", function() {
+    clickCount++;
 
-      pocoBtn.style.transform = `scale(${pocoScale})`;
-      tantoBtn.style.transform = `scale(${tantoScale})`;
+    pocoSize -= 0.15;
+    tantoSize += 0.25;
 
-      // Se tanto diventa gigante, occupa tutto
-      if (tantoScale > 8) {
-        tantoBtn.style.position = "fixed";
-        tantoBtn.style.inset = "0";
-        tantoBtn.style.width = "100vw";
-        tantoBtn.style.height = "100vh";
-        tantoBtn.style.borderRadius = "0";
-        tantoBtn.style.fontSize = "3rem";
-      }
-    });
+    if (pocoSize < 0.3) pocoSize = 0.3;
 
-    tantoBtn.addEventListener("click", () => {
-      if (tantoScale > 8) {
-        finalScreen.classList.add("show");
-      }
-    });
-  </script>
+    pocoBtn.style.transform = "scale(" + pocoSize + ")";
+    tantoBtn.style.transform = "scale(" + tantoSize + ")";
+
+    if (clickCount >= 5) {
+        document.body.innerHTML = `
+            <div class="thankyou">
+                awwww lo sapevo!! anche io xdxd 💖🎬✨
+            </div>
+        `;
+        document.body.style.background = "linear-gradient(45deg, #ff00cc, #3333ff)";
+    }
+});
+</script>
 
 </body>
 </html>
