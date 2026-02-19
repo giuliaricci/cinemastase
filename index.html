@@ -1,343 +1,172 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>cinema stasera?</title>
-    <style>
-        :root {
-            --pink: #f472b6;
-            --purple: #c084fc;
-            --cyan: #67e8f9;
-            --text: #ffffff;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quanto sei contento?</title>
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
 
-        body {
-            min-height: 100vh;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #4c1d95, #1e3a8a, #831843);
-            color: var(--text);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 1.2s ease;
-        }
+    body {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #d9a7ff, #a7c7ff, #ffb7f5);
+      background-size: 400% 400%;
+      animation: gradientShift 12s ease infinite;
+      overflow: hidden;
+    }
 
-        .screen {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.9s cubic-bezier(0.23, 1, 0.32, 1);
-            width: 100%;
-            height: 100%;
-        }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
 
-        #start-screen {
-            z-index: 2;
-            opacity: 1;
-        }
+    .container {
+      text-align: center;
+      padding: 40px;
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 30px;
+      box-shadow: 0 0 40px rgba(255,255,255,0.4);
+      transition: all 0.6s ease;
+    }
 
-        #final-screen {
-            z-index: 1;
-            opacity: 0;
-            pointer-events: none;
-        }
+    h1 {
+      font-size: 2rem;
+      color: white;
+      margin-bottom: 40px;
+      text-shadow: 0 0 15px rgba(255,255,255,0.8);
+    }
 
-        .question {
-            font-size: clamp(2.8rem, 8.5vw, 5.2rem);
-            font-weight: 900;
-            text-align: center;
-            line-height: 1.05;
-            max-width: 90%;
-            margin-bottom: 3.5rem;
-            text-shadow: 
-                0 0 20px rgba(255,255,255,0.4),
-                0 0 40px rgba(248, 113, 182, 0.3);
-            letter-spacing: -0.03em;
-            transition: all 0.4s ease;
-        }
+    .buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+    }
 
-        .buttons {
-            display: flex;
-            gap: 3.5rem;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            transition: all 0.6s ease;
-        }
+    button {
+      padding: 15px 40px;
+      border-radius: 40px;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      backdrop-filter: blur(10px);
+    }
 
-        .btn {
-            padding: 1.4rem 3.2rem;
-            font-size: clamp(1.6rem, 4.5vw, 2.4rem);
-            font-weight: 700;
-            border: none;
-            border-radius: 9999px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-transform: lowercase;
-            letter-spacing: 0.04em;
-            white-space: nowrap;
-            box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.4);
-            user-select: none;
-        }
+    #poco {
+      background: rgba(255,255,255,0.3);
+      color: white;
+      box-shadow: 0 0 15px rgba(255,255,255,0.6);
+    }
 
-        .btn.poco {
-            background: rgba(255, 255, 255, 0.15);
-            color: #fff;
-            border: 4px solid #c4b5fd;
-            backdrop-filter: blur(12px);
-            box-shadow: 
-                0 15px 35px -10px rgba(0, 0, 0, 0.4),
-                0 0 25px rgba(165, 243, 252, 0.6);
-        }
+    #tanto {
+      background: white;
+      color: #7b5cff;
+      font-weight: bold;
+      box-shadow: 0 0 20px rgba(255,255,255,0.9);
+    }
 
-        .btn.tanto {
-            background: linear-gradient(90deg, var(--pink), var(--cyan));
-            color: #1e1b4b;
-            border: 4px solid #fff;
-            box-shadow: 
-                0 15px 35px -10px rgba(0, 0, 0, 0.5),
-                0 0 45px rgba(248, 113, 182, 0.7);
-        }
+    button:hover {
+      transform: scale(1.1);
+    }
 
-        .btn:hover {
-            filter: brightness(1.15);
-            box-shadow: 
-                0 20px 45px -10px rgba(0, 0, 0, 0.5),
-                0 0 55px rgba(248, 113, 182, 0.9);
-        }
+    .final-screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background: linear-gradient(135deg, #ffb7f5, #a7c7ff);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
 
-        /* Quando "tanto" domina */
-        .tanto-dominant .btn.poco {
-            transform: scale(0.4) !important;
-            opacity: 0.4;
-            pointer-events: none;
-        }
+    .final-screen.show {
+      opacity: 1;
+      pointer-events: all;
+    }
 
-        .tanto-dominant .btn.tanto {
-            transform: scale(1.9) !important;
-            padding: 1.8rem 4.8rem;
-            font-size: clamp(2.2rem, 6vw, 3.2rem);
-            box-shadow: 
-                0 30px 70px -15px rgba(0,0,0,0.6),
-                0 0 80px rgba(248,113,182,1);
-            z-index: 10;
-        }
+    .final-text {
+      font-size: 3rem;
+      color: white;
+      text-shadow: 0 0 25px rgba(255,255,255,0.9);
+      animation: pop 0.8s ease forwards;
+    }
 
-        .tanto-dominant .buttons {
-            gap: 1rem;
-        }
+    @keyframes pop {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
 
-        /* Final screen */
-        .message {
-            font-size: clamp(3.8rem, 11vw, 7rem);
-            font-weight: 900;
-            text-align: center;
-            text-shadow: 
-                0 0 30px #fff,
-                0 0 60px var(--pink),
-                0 0 90px var(--purple);
-            animation: finalPop 1.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            letter-spacing: -0.04em;
-        }
+    @media (max-width: 600px) {
+      h1 { font-size: 1.5rem; }
+      button { padding: 12px 25px; font-size: 1rem; }
+      .final-text { font-size: 2rem; }
+    }
 
-        @keyframes finalPop {
-            0% {
-                opacity: 0;
-                transform: scale(0.4) translateY(40px);
-            }
-            60% {
-                transform: scale(1.12) translateY(-10px);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        .sparkles {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .sparkle {
-            position: absolute;
-            font-size: 2.2rem;
-            color: #fff;
-            text-shadow: 0 0 15px #fff;
-            animation: twinkle 3.2s infinite ease-in-out;
-            user-select: none;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { 
-                opacity: 0.35; 
-                transform: scale(0.7) rotate(0deg); 
-            }
-            50% { 
-                opacity: 1; 
-                transform: scale(1.35) rotate(15deg); 
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            .buttons {
-                gap: 2rem;
-            }
-            .btn {
-                padding: 1.1rem 2.4rem;
-            }
-            .tanto-dominant .btn.tanto {
-                transform: scale(1.6) !important;
-                padding: 1.4rem 3.8rem;
-            }
-        }
-    </style>
+  </style>
 </head>
+
 <body>
-    <!-- Schermata iniziale -->
-    <div id="start-screen" class="screen">
-        <h1 class="question">quanto sei contento<br>di andare al cinema stasera?</h1>
-        
-        <div class="buttons" id="buttons-container">
-            <button id="poco-btn" class="btn poco">poco</button>
-            <button id="tanto-btn" class="btn tanto">tanto</button>
-        </div>
+
+  <div class="container" id="main">
+    <h1>quanto sei contento di andare al cinema stasera?</h1>
+    <div class="buttons">
+      <button id="poco">poco</button>
+      <button id="tanto">tanto</button>
     </div>
+  </div>
 
-    <!-- Schermata finale -->
-    <div id="final-screen" class="screen">
-        <div class="sparkles" id="sparkles"></div>
-        <h1 class="message">awww lo sapevo</h1>
-    </div>
+  <div class="final-screen" id="final">
+    <div class="final-text">awww lo sapevo</div>
+  </div>
 
-    <script>
-        // ====================== VARIABILI ======================
-        let pocoScale  = 1;
-        let tantoScale = 1;
-        let pocoClicks = 0;
-        const MAX_POCO_CLICKS = 6;          // dopo 6 click su "poco" → tanto domina
-        const SCALE_POCO_STEP  = 0.82;
-        const SCALE_TANTO_STEP = 1.22;
+  <script>
+    const pocoBtn = document.getElementById("poco");
+    const tantoBtn = document.getElementById("tanto");
+    const finalScreen = document.getElementById("final");
 
-        // ====================== ELEMENTI DOM ======================
-        const startScreen       = document.getElementById('start-screen');
-        const finalScreen       = document.getElementById('final-screen');
-        const pocoBtn           = document.getElementById('poco-btn');
-        const tantoBtn          = document.getElementById('tanto-btn');
-        const buttonsContainer  = document.getElementById('buttons-container');
-        const sparklesContainer = document.getElementById('sparkles');
+    let pocoScale = 1;
+    let tantoScale = 1;
 
-        // ====================== FUNZIONI ======================
+    pocoBtn.addEventListener("click", () => {
+      pocoScale *= 0.8;
+      tantoScale *= 1.3;
 
-        function createSparkles() {
-            const emojis = ['✨', '🌟', '💫', '⭐', '✨'];
-            const positions = [
-                {left: '8%', top: '15%', size: '2.8rem', delay: '0s'},
-                {left: '18%', top: '28%', size: '1.9rem', delay: '0.6s'},
-                {left: '27%', top: '12%', size: '2.4rem', delay: '1.2s'},
-                {left: '45%', top: '35%', size: '3.1rem', delay: '0.3s'},
-                {left: '62%', top: '18%', size: '2.1rem', delay: '1.8s'},
-                {left: '73%', top: '42%', size: '2.7rem', delay: '0.9s'},
-                {left: '85%', top: '22%', size: '1.8rem', delay: '2.1s'},
-                {left: '12%', top: '65%', size: '2.5rem', delay: '0.4s'},
-                {left: '35%', top: '72%', size: '2.3rem', delay: '1.5s'},
-                {left: '68%', top: '68%', size: '3rem', delay: '0.7s'},
-                {left: '82%', top: '55%', size: '2rem', delay: '1.9s'}
-            ];
+      pocoBtn.style.transform = `scale(${pocoScale})`;
+      tantoBtn.style.transform = `scale(${tantoScale})`;
 
-            positions.forEach(pos => {
-                const sparkle = document.createElement('div');
-                sparkle.className = 'sparkle';
-                sparkle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                sparkle.style.left = pos.left;
-                sparkle.style.top = pos.top;
-                sparkle.style.fontSize = pos.size;
-                sparkle.style.animationDelay = pos.delay;
-                sparklesContainer.appendChild(sparkle);
-            });
-        }
+      // Se tanto diventa gigante, occupa tutto
+      if (tantoScale > 8) {
+        tantoBtn.style.position = "fixed";
+        tantoBtn.style.inset = "0";
+        tantoBtn.style.width = "100vw";
+        tantoBtn.style.height = "100vh";
+        tantoBtn.style.borderRadius = "0";
+        tantoBtn.style.fontSize = "3rem";
+      }
+    });
 
-        function showFinalScreen() {
-            document.body.style.background = 'linear-gradient(135deg, #6b21a8, #db2777, #1e40af)';
-            startScreen.style.opacity = '0';
-            
-            setTimeout(() => {
-                startScreen.style.display = 'none';
-                finalScreen.style.opacity = '1';
-                finalScreen.style.pointerEvents = 'auto';
-            }, 850);
-        }
+    tantoBtn.addEventListener("click", () => {
+      if (tantoScale > 8) {
+        finalScreen.classList.add("show");
+      }
+    });
+  </script>
 
-        function makeTantoDominant() {
-            buttonsContainer.classList.add('tanto-dominant');
-            pocoBtn.style.pointerEvents = 'none';
-            tantoBtn.style.cursor = 'pointer';
-            tantoBtn.focus();
-        }
-
-        // ====================== EVENT LISTENERS ======================
-
-        pocoBtn.addEventListener('click', () => {
-            pocoClicks++;
-            
-            // Riduci poco
-            pocoScale = Math.max(pocoScale * SCALE_POCO_STEP, 0.25);
-            pocoBtn.style.transform = `scale(${pocoScale})`;
-            
-            // Ingrandisci tanto
-            tantoScale *= SCALE_TANTO_STEP;
-            tantoBtn.style.transform = `scale(${tantoScale})`;
-
-            // Dopo tot click → tanto prende il controllo
-            if (pocoClicks >= MAX_POCO_CLICKS) {
-                makeTantoDominant();
-            }
-        });
-
-        tantoBtn.addEventListener('click', () => {
-            // Basta un click su tanto dopo che ha preso il dominio
-            if (pocoClicks >= MAX_POCO_CLICKS) {
-                showFinalScreen();
-            }
-            // Se cliccato prima → niente di speciale (puoi anche toglierlo se vuoi)
-        });
-
-        // ====================== INIT ======================
-        function init() {
-            pocoBtn.style.transition = 'all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
-            tantoBtn.style.transition = 'all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)';
-            
-            createSparkles();
-
-            // Glow hover extra
-            const allBtns = document.querySelectorAll('.btn');
-            allBtns.forEach(btn => {
-                btn.addEventListener('mouseenter', () => {
-                    btn.style.boxShadow = btn.classList.contains('tanto')
-                        ? '0 25px 55px -10px rgba(0,0,0,0.5), 0 0 65px rgba(248,113,182,0.95)'
-                        : '0 20px 45px -10px rgba(0,0,0,0.4), 0 0 35px rgba(165,243,252,0.8)';
-                });
-                btn.addEventListener('mouseleave', () => {
-                    btn.style.boxShadow = '';
-                });
-            });
-        }
-
-        window.addEventListener('load', init);
-    </script>
 </body>
 </html>
+
